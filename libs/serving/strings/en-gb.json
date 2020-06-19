@@ -1,0 +1,29 @@
+{
+  "user_not_exist": "User does not exist.",
+  "user_invalid_credentials": "You have entered invalid credentials. Please check and try again.",
+  "user_email_taken": "This email is already taken. Please use another one.",
+  "user_been_created": "User has been created successfully.",
+  "user_email_not_found": "This email is not found. Please register and try to log in again.",
+  "user_not_confirmed": "User {0} is not confirmed. Please, confirmed to log in.",
+  "user_logged_out": "User {0} has been logged out.",
+  "user_id_not_found": "User by id {0} does not exist.",
+  "user_data_changed": "User info successfully changed.",
+  "user_deleted": "User has been successfully deleted.",
+
+  "confirmation_not_found": "This confirmation link does not exist.",
+  "confirmation_link_expired": "Your confirmation link has been expired!",
+  "confirmation_link_already_confirmed": "Account has been already confirmed.",
+  "confirmation_link_confirmed": "Your email has been confirmed! You can log in.",
+
+  "mailgun_sending_error": "Message sending failed.",
+  "user_registration_confirmation_subject": "Registration confirmation.",
+  "user_registration_confirmation_text" : "Please click link to confirm your registration",
+
+  "operation_fatal_error": "Cannot implement the operation. Rollback.",
+
+  "code_401": "Access denied.",
+
+  "email2fa_failed": "Second factor authentication failed. Rollback.",
+  "email2fa_code_mail_subject": "Second Factor Verification",
+  "email2fa_code_mail_text": "Your verification code will be available at {0} minutes:"
+}

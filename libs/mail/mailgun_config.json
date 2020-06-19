@@ -1,0 +1,6 @@
+{
+  "mailgun_base_message_url": "https://api.mailgun.net/v3/sandbox0a263b37142249ae94bbd00931c2e062.mailgun.org/messages",
+  "mailgun_domain_name": "sandbox0a263b37142249ae94bbd00931c2e062.mail.org",
+  "mailgun_api_key": "key-eeac3023359fdda6f17fe9032574e7da",
+  "mailgun_from_email": "<mail@sandbox0a263b37142249ae94bbd00931c2e062.mail.org>"
+}
