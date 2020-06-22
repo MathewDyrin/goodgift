@@ -14,6 +14,7 @@ from flask_jwt_extended import (
 from src.extensions import b_crypt, BLACKLIST
 from src.models.user import UserModel
 from src.models.confirmation import ConfirmationModel
+from libs.passhash import PassCrypt
 from libs.mail.mailgun import MailGunException
 from libs.serving import response_quote
 from libs.f2auth.email_f2auth import EmailSecondFA
@@ -40,9 +41,11 @@ class UserRegister(Resource):
         data = request.get_json()
         if UserModel.find_by_email(data["email"]):
             return {"message": response_quote("user_email_taken")}, 400  # TODO:
+        password_salt, password_hash = PassCrypt.generate_password_hash(data["password"])
         user = UserModel(
             username=data["username"],
-            password=b_crypt.generate_password_hash(data["password"]).decode("utf-8"),
+            password_hash=password_hash,
+            password_salt=password_salt,
             email=data["email"],
             sha_private=hashlib.sha256(str.encode(data["email"])).hexdigest()
         )
@@ -70,7 +73,7 @@ class UserLogin(Resource):
         """
         data = request.get_json()
         user = UserModel.find_by_email(data["email"])
-        if user and b_crypt.check_password_hash(user.password, data["password"]):
+        if user and PassCrypt.check_password_hash(user.password_hash, user.password_salt, data["password"]):
             confirmation = user.most_recent_confirmation
             if confirmation and confirmation.confirmed:
                 access_token = create_access_token(identity=user.sha_private, expires_delta=EXPIRES_DELTA)

@@ -13,16 +13,17 @@ class UserModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), nullable=False, unique=True, index=True)
-    name = db.Column(db.String(80))
-    surname = db.Column(db.String(80))
-    profile_pic = db.Column(db.String(64), nullable=False, default="gg_default_profile_pic.png")
-    locality = db.Column(db.String(120))
-    password = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
+    password_hash = db.Column(db.String(80), nullable=False)
+    password_salt = db.Column(db.String(80), nullable=False)
     sha_private = db.Column(db.String(256), nullable=False)  # just for development
     balance = db.Column(db.Integer, default=0)
     second_fa_enabled = db.Column(db.Boolean, nullable=False, default=False)  # MAY BE NOT PRODUCTION IMPLEMENTING
     token_2fa = db.Column(db.String(120))
+    name = db.Column(db.String(80))
+    surname = db.Column(db.String(80))
+    profile_pic = db.Column(db.String(64), nullable=False, default="gg_default_profile_pic.png")
+    locality = db.Column(db.String(120))
 
     confirmation = db.relationship(
         "ConfirmationModel",

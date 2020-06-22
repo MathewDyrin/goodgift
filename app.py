@@ -11,7 +11,7 @@ def create_all():
     db.create_all()
 
 
-set_localization('ru-ru')
+set_localization('en-gb')
 
 if __name__ == '__main__':
     app.run()

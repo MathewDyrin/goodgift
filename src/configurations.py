@@ -20,4 +20,5 @@ class ProductionConfig:
     SQLALCHEMY_DATABASE_URI = 'postgres://fsollwoh:VG-oDpKT5YzYUc6nbTYtjVKH5U0JW32u@balarama.db.elephantsql.com:5432/fsollwoh'
     JWT_SECRET_KEY = 'super-secret'
     JWT_BLACKLIST_ENABLED = True
-    DEBUG = False
+    # TODO: DEBUG FALSE
+    DEBUG = True
