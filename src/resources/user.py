@@ -11,7 +11,7 @@ from flask_jwt_extended import (
     get_raw_jwt,
     jwt_refresh_token_required
 )
-from src.extensions import b_crypt, BLACKLIST
+from src.extensions import BLACKLIST
 from src.models.user import UserModel
 from src.models.confirmation import ConfirmationModel
 from libs.passhash import PassCrypt
@@ -85,7 +85,7 @@ class UserLogin(Resource):
                         user.token_2fa = token
                         user.save_to_db()
                         user.send_email_2fa_code(code)
-                        return {"verification_token": token}
+                        return {"verification_token": token}, 200
                     except MailGunException as e:
                         return {"message": str(e)}
                 return {"access_token": access_token, "refresh_token": refresh_token}, 201
@@ -106,6 +106,45 @@ class UserLogout(Resource):
         return {"message": response_quote("user_logged_out").format(username)}, 200
 
 
+class UserPasswordRestoreRequest(Resource):
+    @classmethod
+    def post(cls):
+        data = request.get_json()
+        user = UserModel.find_by_email(data["email"])
+        if user:
+            try:
+                token = hashlib.sha256(str.encode(user.sha_private)).hexdigest()
+                code = EmailSecondFA.generate_2fa_code(token)
+                user.token_2fa = token
+                user.save_to_db()
+                user.send_email_2fa_code(code)
+                return {"verification_code": token}, 200
+            except MailGunException as e:
+                return {"message": str(e)}, 500
+        return {"message": response_quote("user_not_exist")}, 404
+
+
+class UserPasswordReSetter(Resource):
+    @classmethod
+    def post(cls, token: str):
+        data = request.get_json()
+        user = UserModel.find_by_token_2fa(token)
+        if user:
+            response = EmailSecondFA.check_2fa_code(token, data["code"])
+            if response:
+                password_salt, password_hash = PassCrypt.generate_password_hash(data["new_password"])
+                user.password_salt = password_salt
+                user.password_hash = password_hash
+                user.token_2fa = None
+                user.save_to_db()
+                EmailSecondFA.force_revoke_2fa_code(token)
+                # TODO: tokens revoking
+                return {"message": "User's password successfully changed."}, 201
+            return {"message": response_quote("email2fa_failed")}, 401
+        # TODO: answer bad gateway
+        return {"message": response_quote("user_not_exist")}, 404
+
+
 class TokenRefresher(Resource):
     @classmethod
     @jwt_refresh_token_required
@@ -124,11 +163,15 @@ class UserEmail2FA(Resource):
             if response:
                 access_token = create_access_token(identity=user.sha_private, expires_delta=EXPIRES_DELTA)
                 refresh_token = create_refresh_token(identity=user.sha_private)
+                user.token_2fa = None
+                user.save_to_db()
+                EmailSecondFA.force_revoke_2fa_code(token)
                 return {
                     "access_token": access_token,
                     "refresh_token": refresh_token
                 }, 200
-            return {"message": response_quote("email2fa_failed")}, 400
+            return {"message": response_quote("email2fa_failed")}, 401
+        # TODO: переделать в bad gateway
         return {"message": response_quote("user_not_exist")}, 404
 
 

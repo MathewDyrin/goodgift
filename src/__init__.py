@@ -17,6 +17,8 @@ from src.resources.user import (
     UserRegister,
     UserList,
     UserLogin,
+    UserPasswordRestoreRequest,
+    UserPasswordReSetter,
     User,
     Content,
     UserLogout,
@@ -50,6 +52,8 @@ def create_app(config_class='configurations.py'):
     api.add_resource(UserRegister, '/users/register')
     api.add_resource(UserLogin, '/users/login')
     api.add_resource(UserLogout, '/users/logout')
+    api.add_resource(UserPasswordRestoreRequest, '/users/restore')
+    api.add_resource(UserPasswordReSetter, '/users/restore/<string:token>')
     api.add_resource(User, '/user/<int:_id>')
     api.add_resource(UserList, '/users/<int:limit>')
     api.add_resource(TokenRefresher, '/users/refreshing')
