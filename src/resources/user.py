@@ -171,7 +171,7 @@ class UserEmail2FA(Resource):
                 }, 200
             return {"message": response_quote("email2fa_failed")}, 401
         # TODO: переделать в bad gateway
-        return {"message": response_quote("user_not_exist")}, 404
+        return {"message": response_quote("code_404")}, 404
 
 
 class User(Resource):
