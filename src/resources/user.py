@@ -243,7 +243,7 @@ class HardwareData(Resource):
     @classmethod
     def get(cls):
         ip = request.remote_addr
-        real_ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+        real_ip = request.environ.get('X_Forwarded_For', request.remote_addr)
         print(real_ip)
         user_agent = request.headers.get('User_Agent')
         return jsonify(ip=ip, hardware=user_agent, real_ip=real_ip)
