@@ -1,7 +1,7 @@
 import datetime
 import hashlib
 import traceback
-from flask import request
+from flask import request, jsonify
 from flask_restful import Resource
 from flask_jwt_extended import (
     jwt_required,
@@ -230,4 +230,8 @@ class Content(Resource):
     @classmethod
     @jwt_required
     def get(cls):
-        return "secret content"
+        data = request.remote_addr
+        user_agent = request.headers.get('User-Agent')
+        print(user_agent)
+        print(data)
+        return jsonify(ip=data, user_agent=user_agent)
