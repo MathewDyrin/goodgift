@@ -231,4 +231,4 @@ class Content(Resource):
     @classmethod
     @jwt_required
     def get(cls):
-        return 'secret-data'
+        return UserModel.find_by_sha_token(get_jwt_identity()).username
