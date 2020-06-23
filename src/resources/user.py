@@ -226,6 +226,7 @@ class UserList(Resource):
         return {"users_list": [user.turn_to_json() for user in UserModel.query.limit(limit)]}
 
 
+# JUST FOR TESTING
 class Content(Resource):
     @classmethod
     @jwt_required
@@ -235,3 +236,12 @@ class Content(Resource):
         print(user_agent)
         print(data)
         return jsonify(ip=data, user_agent=user_agent)
+
+
+# JUST FOR TESTING
+class HardwareData(Resource):
+    @classmethod
+    def get(cls):
+        ip = request.remote_addr
+        user_agent = request.headers.get('User_Agent')
+        return jsonify(ip=ip, hardware=user_agent)

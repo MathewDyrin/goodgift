@@ -23,7 +23,8 @@ from src.resources.user import (
     Content,
     UserLogout,
     TokenRefresher,
-    UserEmail2FA
+    UserEmail2FA,
+    HardwareData
 )
 # from src.resources.oauth import (
 #     GithubLogin,
@@ -58,6 +59,9 @@ def create_app(config_class=ProductionConfig):
     api.add_resource(UserList, '/users/<int:limit>')
     api.add_resource(TokenRefresher, '/user/refreshing')
     api.add_resource(UserEmail2FA, '/user/fa2_auth/<string:token>')
+
+    # JUST FOR TESTING
+    api.add_resource(HardwareData, '/info')
 
     print(f"App current configuration: {config_class.CONFIG_NAME}")
 
