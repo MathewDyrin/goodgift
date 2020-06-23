@@ -5,6 +5,7 @@ from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import (
     jwt_required,
+    jwt_optional,
     get_jwt_identity,
     create_access_token,
     create_refresh_token,
@@ -176,7 +177,7 @@ class UserEmail2FA(Resource):
 
 class User(Resource):
     @classmethod
-    # @jwt_required  --- make auth
+    @jwt_optional
     # TODO: REMAKE WITH SCHEMAS
     def get(cls, _id: int):
         user = UserModel.find_by_id(_id)
