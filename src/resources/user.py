@@ -231,19 +231,4 @@ class Content(Resource):
     @classmethod
     @jwt_required
     def get(cls):
-        data = request.remote_addr
-        user_agent = request.headers.get('User-Agent')
-        print(user_agent)
-        print(data)
-        return jsonify(ip=data, user_agent=user_agent)
-
-
-# JUST FOR TESTING
-class HardwareData(Resource):
-    @classmethod
-    def get(cls):
-        ip = request.remote_addr
-        real_ip = request.environ.get('X_Forwarded_For', request.remote_addr)
-        print(real_ip)
-        user_agent = request.headers.get('User_Agent')
-        return jsonify(ip=ip, hardware=user_agent, real_ip=real_ip)
+        return 'secret-data'
