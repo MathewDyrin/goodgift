@@ -6,6 +6,7 @@
   "user_email_not_found": "This email is not found. Please register and try to log in again.",
   "user_not_confirmed": "User {0} is not confirmed. Please, confirmed to log in.",
   "user_logged_out": "User {0} has been logged out.",
+  "user_password_reset": "User password successfully changed.",
   "user_id_not_found": "User by id {0} does not exist.",
   "user_data_changed": "User info successfully changed.",
   "user_deleted": "User has been successfully deleted.",
@@ -25,6 +26,7 @@
   "operation_fatal_error": "Cannot implement the operation. Rollback.",
 
   "code_401": "Access denied.",
+  "code_404": "Requested resource is not found.",
 
   "email2fa_failed": "Second factor authentication failed. Rollback.",
   "email2fa_code_mail_subject": "Second Factor Verification",

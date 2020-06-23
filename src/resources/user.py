@@ -139,11 +139,9 @@ class UserPasswordReSetter(Resource):
                 user.save_to_db()
                 EmailSecondFA.force_revoke_2fa_code(token)
                 # TODO: tokens revoking
-                # TODO: response quote
-                return {"message": "User's password successfully changed."}, 201
+                return {"message": response_quote("user_password_reset")}, 201
             return {"message": response_quote("email2fa_failed")}, 401
-        # TODO: answer bad gateway
-        return {"message": response_quote("user_not_exist")}, 404
+        return {"message": response_quote("code_404")}, 404
 
 
 class TokenRefresher(Resource):
