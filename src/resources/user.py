@@ -117,8 +117,8 @@ class UserPasswordRestoreRequest(Resource):
                 code = EmailSecondFA.generate_2fa_code(token)
                 user.token_2fa = token
                 user.save_to_db()
-                user.send_email_2fa_code(code)
-                return {"verification_code": token}, 200
+                user.password_reset_request(code)
+                return {"request_token": token}, 200
             except MailGunException as e:
                 return {"message": str(e)}, 500
         return {"message": response_quote("user_not_exist")}, 404
@@ -139,6 +139,7 @@ class UserPasswordReSetter(Resource):
                 user.save_to_db()
                 EmailSecondFA.force_revoke_2fa_code(token)
                 # TODO: tokens revoking
+                # TODO: response quote
                 return {"message": "User's password successfully changed."}, 201
             return {"message": response_quote("email2fa_failed")}, 401
         # TODO: answer bad gateway

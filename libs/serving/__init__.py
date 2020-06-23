@@ -10,7 +10,7 @@ cashed_strings = {}
 
 def refresh() -> None:
     global cashed_strings
-    with open(f"libs/serving/strings/{default_localization}.json") as f:
+    with open(f"libs/serving/strings/{default_localization}.json", encoding="utf-8") as f:
         cashed_strings = json.load(f)
 
 

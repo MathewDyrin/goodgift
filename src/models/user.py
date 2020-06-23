@@ -77,6 +77,13 @@ class UserModel(db.Model):
 
         return MailGun.send_email_message([self.email], subject, text, html)
 
+    def password_reset_request(self, code: str) -> Response:
+        subject = f"{response_quote('user_password_restore_subject').format(self.email)}"
+        text = f"{response_quote('user_password_restore_text').format(code)}"
+        html = f'<html>{response_quote("user_password_restore_text").format(code)}</html>'
+
+        return MailGun.send_email_message([self.email], subject, text, html)
+
     def send_email_2fa_code(self, code: str) -> Response:
         subject = response_quote("email2fa_code_mail_subject")
         text = response_quote("email2fa_code_mail_text")

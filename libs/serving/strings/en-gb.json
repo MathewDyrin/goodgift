@@ -19,6 +19,9 @@
   "user_registration_confirmation_subject": "Registration confirmation.",
   "user_registration_confirmation_text" : "Please click link to confirm your registration",
 
+  "user_password_restore_subject": "Password reset reset for {0}.",
+  "user_password_restore_text": "You verification code for password reset: {0}. If you did not reset your password account, please ignore this message or contact GoodGift support.",
+
   "operation_fatal_error": "Cannot implement the operation. Rollback.",
 
   "code_401": "Access denied.",

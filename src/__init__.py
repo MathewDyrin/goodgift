@@ -35,9 +35,9 @@ from src.configurations import DevelopmentConfig, ProductionConfig, TestingConfi
 from dotenv import load_dotenv
 
 
-def create_app(config_class='configurations.py'):
+def create_app(config_class=ProductionConfig):
     app = Flask(__name__)
-    app.config.from_object(ProductionConfig)
+    app.config.from_object(config_class)
     load_dotenv()
     jwt.init_app(app)
     api = Api(app)
@@ -49,22 +49,24 @@ def create_app(config_class='configurations.py'):
     # oauth.init_app(app)
 
     # USER API
-    api.add_resource(UserRegister, '/users/register')
-    api.add_resource(UserLogin, '/users/login')
-    api.add_resource(UserLogout, '/users/logout')
-    api.add_resource(UserPasswordRestoreRequest, '/users/restore')
-    api.add_resource(UserPasswordReSetter, '/users/restore/<string:token>')
+    api.add_resource(UserRegister, '/user/register')
+    api.add_resource(UserLogin, '/user/login')
+    api.add_resource(UserLogout, '/user/logout')
+    api.add_resource(UserPasswordRestoreRequest, '/user/restore')
+    api.add_resource(UserPasswordReSetter, '/user/restore/<string:token>')
     api.add_resource(User, '/user/<int:_id>')
     api.add_resource(UserList, '/users/<int:limit>')
-    api.add_resource(TokenRefresher, '/users/refreshing')
-    api.add_resource(UserEmail2FA, '/users/fa2_auth/<string:token>')
+    api.add_resource(TokenRefresher, '/user/refreshing')
+    api.add_resource(UserEmail2FA, '/user/fa2_auth/<string:token>')
+
+    print(f"App current configuration: {config_class.CONFIG_NAME}")
 
     # OAuth API
     # api.add_resource(GithubLogin, "/login/oauth/github")
     # api.add_resource(GithubAuthorize, "/login/oauth/github/authorized")
 
     # CONFIRMATION API
-    api.add_resource(Confirmation, '/user_id/<string:confirmation_id>')
+    api.add_resource(Confirmation, '/user/confirmation/<string:confirmation_id>')
 
     # resources.add_resource(User, '/users/<int:user_id>')
     api.add_resource(CreatePost, '/posts/create')
