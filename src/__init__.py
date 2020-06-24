@@ -35,7 +35,7 @@ from src.configurations import DevelopmentConfig, ProductionConfig, TestingConfi
 from dotenv import load_dotenv
 
 
-def create_app(config_class=ProductionConfig):
+def create_app(config_class=DevelopmentConfig):
     app = Flask(__name__)
     app.config.from_object(config_class)
     load_dotenv()

@@ -48,7 +48,7 @@ class UserRegister(Resource):
             password_hash=password_hash,
             password_salt=password_salt,
             email=data["email"],
-            sha_private=hashlib.sha256(str.encode(data["email"])).hexdigest()
+            session_key=hashlib.sha256(str.encode(data["email"])).hexdigest()
         )
         try:
             user.save_to_db()
@@ -77,11 +77,11 @@ class UserLogin(Resource):
         if user and PassCrypt.check_password_hash(user.password_hash, user.password_salt, data["password"]):
             confirmation = user.most_recent_confirmation
             if confirmation and confirmation.confirmed:
-                access_token = create_access_token(identity=user.sha_private, expires_delta=EXPIRES_DELTA)
-                refresh_token = create_refresh_token(identity=user.sha_private)
+                access_token = create_access_token(identity=user.session_key, expires_delta=EXPIRES_DELTA)
+                refresh_token = create_refresh_token(identity=user.session_key)
                 if user.second_fa_enabled:
                     try:
-                        token = hashlib.sha256(str.encode(user.sha_private)).hexdigest()
+                        token = hashlib.sha256(str.encode(user.session_key)).hexdigest()
                         code = EmailSecondFA.generate_2fa_code(token)  # еще подумать над этим функционалом
                         user.token_2fa = token
                         user.save_to_db()
@@ -102,7 +102,7 @@ class UserLogout(Resource):
     def post(cls):
         # TODO: NOT PERFECT
         jti = get_raw_jwt()["jti"]
-        username = UserModel.find_by_sha_token(get_jwt_identity()).username
+        username = UserModel.find_by_session_key(get_jwt_identity()).username
         BLACKLIST.add(jti)
         return {"message": response_quote("user_logged_out").format(username)}, 200
 
@@ -114,7 +114,7 @@ class UserPasswordRestoreRequest(Resource):
         user = UserModel.find_by_email(data["email"])
         if user:
             try:
-                token = hashlib.sha256(str.encode(user.sha_private)).hexdigest()
+                token = hashlib.sha256(str.encode(user.session_key)).hexdigest()
                 code = EmailSecondFA.generate_2fa_code(token)
                 user.token_2fa = token
                 user.save_to_db()
@@ -161,8 +161,8 @@ class UserEmail2FA(Resource):
         if user:
             response = EmailSecondFA.check_2fa_code(token, data["code"])
             if response:
-                access_token = create_access_token(identity=user.sha_private, expires_delta=EXPIRES_DELTA)
-                refresh_token = create_refresh_token(identity=user.sha_private)
+                access_token = create_access_token(identity=user.session_key, expires_delta=EXPIRES_DELTA)
+                refresh_token = create_refresh_token(identity=user.session_key)
                 user.token_2fa = None
                 user.save_to_db()
                 EmailSecondFA.force_revoke_2fa_code(token)
@@ -193,7 +193,7 @@ class User(Resource):
         current_user = get_jwt_identity()
         user = UserModel.find_by_id(_id)
         if user:
-            if user.sha_private != current_user:
+            if user.session_key != current_user:
                 return {"message": response_quote("code_401")}, 401
             user.username = data["username"]
             user.name = data["name"]
@@ -212,7 +212,7 @@ class User(Resource):
         current_user = get_jwt_identity()
         user = UserModel.find_by_id(_id)
         if user:
-            if user.sha_private != current_user:
+            if user.session_key != current_user:
                 return {"message": response_quote("code_401")}, 401
             user.delete_from_db()
             # TODO: удалить все jwt токены.
@@ -231,4 +231,4 @@ class Content(Resource):
     @classmethod
     @jwt_required
     def get(cls):
-        return UserModel.find_by_sha_token(get_jwt_identity()).username
+        return UserModel.find_by_session_key(get_jwt_identity()).username

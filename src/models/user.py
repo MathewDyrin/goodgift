@@ -16,7 +16,7 @@ class UserModel(db.Model):
     email = db.Column(db.String(120), nullable=False, unique=True)
     password_hash = db.Column(db.String(80), nullable=False)
     password_salt = db.Column(db.String(80), nullable=False)
-    sha_private = db.Column(db.String(256), nullable=False)  # just for development
+    session_key = db.Column(db.String(256), nullable=False)  # just for development
     balance = db.Column(db.Integer, default=0)
     second_fa_enabled = db.Column(db.Boolean, nullable=False, default=False)  # MAY BE NOT PRODUCTION IMPLEMENTING
     token_2fa = db.Column(db.String(120))
@@ -60,8 +60,8 @@ class UserModel(db.Model):
         return cls.query.filter_by(token_2fa=token).first()
 
     @classmethod
-    def find_by_sha_token(cls, token: str) -> "UserModel":
-        return cls.query.filter_by(sha_private=token).first()
+    def find_by_session_key(cls, key: str) -> "UserModel":
+        return cls.query.filter_by(session_key=key).first()
 
     @classmethod
     def find_by_locality(cls, locality: str):
