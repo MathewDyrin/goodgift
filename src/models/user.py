@@ -16,7 +16,7 @@ class UserModel(db.Model):
     email = db.Column(db.String(120), nullable=False, unique=True)
     password_hash = db.Column(db.String(80), nullable=False)
     password_salt = db.Column(db.String(80), nullable=False)
-    session_key = db.Column(db.String(256), nullable=False)  # just for development
+    session_key = db.Column(db.String(256))  # just for development
     balance = db.Column(db.Integer, default=0)
     second_fa_enabled = db.Column(db.Boolean, nullable=False, default=False)  # MAY BE NOT PRODUCTION IMPLEMENTING
     token_2fa = db.Column(db.String(120))

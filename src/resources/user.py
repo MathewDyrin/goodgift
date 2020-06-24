@@ -47,8 +47,7 @@ class UserRegister(Resource):
             username=data["username"],
             password_hash=password_hash,
             password_salt=password_salt,
-            email=data["email"],
-            session_key=hashlib.sha256(str.encode(data["email"])).hexdigest()
+            email=data["email"]
         )
         try:
             user.save_to_db()
@@ -77,6 +76,9 @@ class UserLogin(Resource):
         if user and PassCrypt.check_password_hash(user.password_hash, user.password_salt, data["password"]):
             confirmation = user.most_recent_confirmation
             if confirmation and confirmation.confirmed:
+                #  в ключ сессии закладывается текущее время сервера во время авторизации.
+                user.session_key = hashlib.sha256(str.encode(str(datetime.datetime.now()))).hexdigest()
+                user.save_to_db()
                 access_token = create_access_token(identity=user.session_key, expires_delta=EXPIRES_DELTA)
                 refresh_token = create_refresh_token(identity=user.session_key)
                 if user.second_fa_enabled:
@@ -102,7 +104,10 @@ class UserLogout(Resource):
     def post(cls):
         # TODO: NOT PERFECT
         jti = get_raw_jwt()["jti"]
-        username = UserModel.find_by_session_key(get_jwt_identity()).username
+        current_user = UserModel.find_by_session_key(get_jwt_identity())
+        current_user.session_key = None
+        current_user.save_to_db()
+        username = current_user.username
         BLACKLIST.add(jti)
         return {"message": response_quote("user_logged_out").format(username)}, 200
 
@@ -149,8 +154,13 @@ class TokenRefresher(Resource):
     @classmethod
     @jwt_refresh_token_required
     def post(cls):
-        user_id = get_jwt_identity()
-        return {"access_token": create_access_token(identity=user_id, expires_delta=EXPIRES_DELTA)}, 201
+        session_key = get_jwt_identity()
+        if not UserModel.find_by_session_key(session_key):
+            return {"message": response_quote("token_expired_signature")}, 401
+        return {
+            "access_token": create_access_token(identity=session_key, expires_delta=EXPIRES_DELTA),
+            "refresh_token": create_access_token(identity=session_key)
+        }, 200
 
 
 class UserEmail2FA(Resource):
@@ -231,4 +241,4 @@ class Content(Resource):
     @classmethod
     @jwt_required
     def get(cls):
-        return UserModel.find_by_session_key(get_jwt_identity()).username
+        return "content jwt"
