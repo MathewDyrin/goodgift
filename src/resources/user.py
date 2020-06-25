@@ -118,7 +118,7 @@ class UserPasswordRestoreRequest(Resource):
         user = UserModel.find_by_email(data["email"])
         if user:
             try:
-                token = hashlib.sha256(str.encode(user.session_key)).hexdigest()
+                token = hashlib.sha256(str.encode(user.email)).hexdigest()
                 code = EmailSecondFA.generate_2fa_code(token)
                 user.token_2fa = token
                 user.save_to_db()
