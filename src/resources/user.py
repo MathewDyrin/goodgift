@@ -41,7 +41,7 @@ class UserRegister(Resource):
     def post(cls):
         data = request.get_json()
         if UserModel.find_by_email(data["email"]):
-            return {"message": response_quote("user_email_taken")}, 400  # TODO:
+            return {"message": response_quote("user_email_taken")}, 400
         password_salt, password_hash = PassCrypt.generate_password_hash(data["password"])
         user = UserModel(
             username=data["username"],
@@ -102,14 +102,15 @@ class UserLogout(Resource):
     @classmethod
     @jwt_required
     def post(cls):
-        # TODO: NOT PERFECT
         jti = get_raw_jwt()["jti"]
         current_user = UserModel.find_by_session_key(get_jwt_identity())
-        current_user.session_key = None
-        current_user.save_to_db()
-        username = current_user.username
-        BLACKLIST.add(jti)
-        return {"message": response_quote("user_logged_out").format(username)}, 200
+        if current_user:
+            current_user.session_key = None
+            current_user.save_to_db()
+            username = current_user.username
+            BLACKLIST.add(jti)
+            return {"message": response_quote("user_logged_out").format(username)}, 200
+        return {"message": response_quote("code_400")}, 400
 
 
 class UserPasswordRestoreRequest(Resource):
@@ -142,9 +143,9 @@ class UserPasswordReSetter(Resource):
                 user.password_salt = password_salt
                 user.password_hash = password_hash
                 user.token_2fa = None
+                user.session_key = None
                 user.save_to_db()
                 EmailSecondFA.force_revoke_2fa_code(token)
-                # TODO: tokens revoking
                 return {"message": response_quote("user_password_reset")}, 201
             return {"message": response_quote("email2fa_failed")}, 401
         return {"message": response_quote("code_404")}, 404
@@ -181,7 +182,6 @@ class UserEmail2FA(Resource):
                     "refresh_token": refresh_token
                 }, 200
             return {"message": response_quote("email2fa_failed")}, 401
-        # TODO: переделать в bad gateway
         return {"message": response_quote("code_404")}, 404
 
 
@@ -225,7 +225,6 @@ class User(Resource):
             if user.session_key != current_user:
                 return {"message": response_quote("code_401")}, 401
             user.delete_from_db()
-            # TODO: удалить все jwt токены.
             return {"message": response_quote("user_deleted")}, 201
         return {"message": response_quote("user_id_not_found").format(_id)}, 404
 

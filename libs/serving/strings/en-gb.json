@@ -27,6 +27,7 @@
 
   "code_401": "Access denied.",
   "code_404": "Requested resource is not found.",
+  "code_400": "Bad request.",
 
   "email2fa_failed": "Second factor authentication failed. Rollback.",
   "email2fa_code_mail_subject": "Second Factor Verification",
