@@ -1,7 +1,7 @@
 import datetime
 import hashlib
 import traceback
-from flask import request, jsonify
+from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import (
     jwt_required,
@@ -68,9 +68,6 @@ class UserLogin(Resource):
     #  TODO: remake with schemas
     @classmethod
     def post(cls):
-        """
-        :return: access_token, refresh_token
-        """
         data = request.get_json()
         user = UserModel.find_by_email(data["email"])
         if user and PassCrypt.check_password_hash(user.password_hash, user.password_salt, data["password"]):
@@ -83,9 +80,10 @@ class UserLogin(Resource):
                 refresh_token = create_refresh_token(identity=user.session_key)
                 if user.second_fa_enabled:
                     try:
-                        token = hashlib.sha256(str.encode(user.session_key)).hexdigest()
-                        code = EmailSecondFA.generate_2fa_code(token)  # еще подумать над этим функционалом
+                        token = hashlib.sha256(str.encode(user.email)).hexdigest()
+                        code = EmailSecondFA.generate_2fa_code(token)
                         user.token_2fa = token
+                        user.session_key = None
                         user.save_to_db()
                         user.send_email_2fa_code(code)
                         return {"verification_token": token}, 200
@@ -172,14 +170,14 @@ class UserEmail2FA(Resource):
         if user:
             response = EmailSecondFA.check_2fa_code(token, data["code"])
             if response:
-                access_token = create_access_token(identity=user.session_key, expires_delta=EXPIRES_DELTA)
-                refresh_token = create_refresh_token(identity=user.session_key)
+                session_key = hashlib.sha256(str.encode(str(datetime.datetime.now()))).hexdigest()
+                user.session_key = session_key
                 user.token_2fa = None
                 user.save_to_db()
                 EmailSecondFA.force_revoke_2fa_code(token)
+                access_token = create_access_token(identity=user.session_key, expires_delta=datetime.timedelta(hours=4))
                 return {
-                    "access_token": access_token,
-                    "refresh_token": refresh_token
+                    "access_token": access_token
                 }, 200
             return {"message": response_quote("email2fa_failed")}, 401
         return {"message": response_quote("code_404")}, 404
@@ -211,8 +209,10 @@ class User(Resource):
             user.locality = data["locality"]
             user.balance = data["balance"]
             user.profile_pic = data["profile_pic"]
+            user.session_key = None if not user.second_fa_enabled and data["second_fa_enabled"] else user.session_key
             user.second_fa_enabled = data["second_fa_enabled"]
             user.save_to_db()
+            print(user.session_key)
             return {"message": response_quote("user_data_changed")}, 201
         return {"message": response_quote("user_id_not_found").format(_id)}, 404
 
