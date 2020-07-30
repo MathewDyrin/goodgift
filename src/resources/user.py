@@ -1,7 +1,7 @@
 import datetime
 import hashlib
 import traceback
-from flask import request
+from flask import request, render_template
 from flask_restful import Resource
 from flask_jwt_extended import (
     jwt_required,
@@ -240,4 +240,5 @@ class Content(Resource):
     @classmethod
     @jwt_required
     def get(cls):
-        return "content jwt"
+        user = get_jwt_identity()
+        return f"session key {user}"

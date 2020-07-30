@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask
+from flask import Flask, render_template
 from flask_restful import Api
 from flask_migrate import Migrate
 from logging.handlers import WatchedFileHandler
@@ -35,7 +35,7 @@ from src.configurations import DevelopmentConfig, ProductionConfig, TestingConfi
 from dotenv import load_dotenv
 
 
-def create_app(config_class=ProductionConfig):
+def create_app(config_class=DevelopmentConfig):
     app = Flask(__name__)
     app.config.from_object(config_class)
     load_dotenv()
@@ -59,6 +59,7 @@ def create_app(config_class=ProductionConfig):
     api.add_resource(TokenRefresher, '/user/refreshing')
     api.add_resource(UserEmail2FA, '/user/fa2_auth/<string:token>')
 
+
     print(f"App current configuration: {config_class.CONFIG_NAME}")
 
     # OAuth API
@@ -71,6 +72,10 @@ def create_app(config_class=ProductionConfig):
     # resources.add_resource(User, '/users/<int:user_id>')
     api.add_resource(CreatePost, '/posts/create')
     api.add_resource(Content, '/content')
+
+    @app.route('/')
+    def home():
+        return render_template("index.html")
 
     # Logging
     log_level = logging.INFO if app.config['DEBUG'] else logging.ERROR
