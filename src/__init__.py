@@ -3,6 +3,7 @@ import logging
 from flask import Flask, render_template
 from flask_restful import Api
 from flask_migrate import Migrate
+from flask_cors import CORS
 from logging.handlers import WatchedFileHandler
 from src.extensions import (
     db,
@@ -40,6 +41,7 @@ def create_app(config_class=ProductionConfig):
     app.config.from_object(config_class)
     load_dotenv()
     jwt.init_app(app)
+    CORS(app)
     api = Api(app)
     db.init_app(app)
     app.cli.add_command(create_tables)  # To interact with app from CLI
@@ -58,7 +60,6 @@ def create_app(config_class=ProductionConfig):
     api.add_resource(UserList, '/users/<int:limit>')
     api.add_resource(TokenRefresher, '/user/refreshing')
     api.add_resource(UserEmail2FA, '/user/fa2_auth/<string:token>')
-
 
     print(f"App current configuration: {config_class.CONFIG_NAME}")
 

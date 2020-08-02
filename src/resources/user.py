@@ -86,7 +86,7 @@ class UserLogin(Resource):
                         user.session_key = None
                         user.save_to_db()
                         user.send_email_2fa_code(code)
-                        return {"verification_token": token}, 200
+                        return {"verification_token": token}, 202
                     except MailGunException as e:
                         return {"message": str(e)}
                 return {"access_token": access_token, "refresh_token": refresh_token}, 201
@@ -190,7 +190,15 @@ class User(Resource):
     def get(cls, _id: int):
         user = UserModel.find_by_id(_id)
         if user:
-            return {"username": user.username, "email": user.email, "balance": user.balance}, 200
+            return {
+                "username": user.username,
+                "name": user.name,
+                "surname": user.surname,
+                "locality": user.locality,
+                "profile_pic": user.profile_pic,
+                "second_fa_enabled": user.second_fa_enabled,
+                "balance": user.balance
+               }, 200
         return {"message": response_quote("user_id_not_found").format(_id)}, 404
 
     @classmethod
@@ -240,5 +248,8 @@ class Content(Resource):
     @classmethod
     @jwt_required
     def get(cls):
-        user = get_jwt_identity()
-        return f"session key {user}"
+        current_user = get_jwt_identity()
+        user = UserModel.find_by_session_key(current_user)
+        if not user:
+                return {"message": response_quote("code_401")}, 401
+        return f"session key {current_user}"
