@@ -14,7 +14,7 @@ from src.extensions import (
     # oauth
 )
 from src.commands import create_tables
-from src.resources.user import (
+from src.api.user import (
     UserRegister,
     UserList,
     UserLogin,
@@ -26,12 +26,12 @@ from src.resources.user import (
     TokenRefresher,
     UserEmail2FA
 )
-# from src.resources.oauth import (
+# from src.api.oauth import (
 #     GithubLogin,
 #     GithubAuthorize
 # )
-from src.resources.confirmation import Confirmation
-from src.resources.posts import CreatePost
+from src.api.confirmation import Confirmation
+from src.api.posts import CreatePost
 from src.configurations import DevelopmentConfig, ProductionConfig, TestingConfig
 from dotenv import load_dotenv
 
@@ -70,7 +70,7 @@ def create_app(config_class=ProductionConfig):
     # CONFIRMATION API
     api.add_resource(Confirmation, '/user/confirmation/<string:confirmation_id>')
 
-    # resources.add_resource(User, '/users/<int:user_id>')
+    # api.add_resource(User, '/users/<int:user_id>')
     api.add_resource(CreatePost, '/posts/create')
     api.add_resource(Content, '/content')
 
