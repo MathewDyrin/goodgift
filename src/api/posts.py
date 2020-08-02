@@ -1,7 +1,7 @@
 from src.extensions import db
 
 
-class PostModel(db.Model):
+class RequestModel(db.Model):
 
     __tablename__ = "requests"
 
@@ -21,11 +21,11 @@ class PostModel(db.Model):
     status = db.Column(db.Integer, nullable=False)
 
     @classmethod
-    def find_by_id(cls, _id: int) -> "PostModel":
+    def find_by_id(cls, _id: int) -> "RequestModel":
         return cls.query.filter_by(id=_id).first()
 
     @classmethod
-    def find_by_theme(cls, theme: str) -> "PostModel":
+    def find_by_theme(cls, theme: str) -> "RequestModel":
         return cls.query.filter_by(theme=theme).first()
 
     def save_to_db(self):
